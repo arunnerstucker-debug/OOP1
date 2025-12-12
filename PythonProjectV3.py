@@ -55,6 +55,7 @@ class Hair_Dresser:
         self.availability[date].remove(TimeSlot)
         key = "A" + str(self.key)
         self.appointments.update({key:{"date": date,"time":TimeSlot, "client": client}})
+        self.key += 1
     def decrease_Availability(self, date, TimeSlot):
         self.availability[date].remove(TimeSlot)
         self.breaks[date].append(TimeSlot)
@@ -81,7 +82,7 @@ class Window:
         print(x)
         self.button.append(x)
         if x in ("Client", "Hair-Dresser"):
-            #self.first.withdraw()
+            self.first.withdraw()
             self.second_Page()
         elif x in ("Sign-In", "Sign-Up"):
             self.second.destroy()
@@ -123,6 +124,13 @@ class Window:
         elif x == "BsixthE":
             self.sixthHE.destroy()
             self.fifth_Page_HE()
+        elif x == "BfifthC":
+            self.fifthC.destroy()
+            self.fourth_Page_C()
+        elif x == "Exit":
+            self.file_Storage()
+            self.first.destroy()
+            SystemExit()
         else:
             for n in self.dates:
                 if x == n:
@@ -132,6 +140,7 @@ class Window:
                     self.fifth_Page_C()
     def user_Entry(self):
         global c, h
+        count = 0
         if self.button[0] == "Client" and self.button[1] == "Sign-Up":
             client.append(Client())
             client[c].add_Client(self.username, self.password)
@@ -144,6 +153,8 @@ class Window:
                     self.user_index = x
                     self.fourth_Page_C()
                 else:
+                    count += 1
+                if count == len(client):
                     self.third_Page()
         elif self.button[0] == "Hair-Dresser" and self.button[1] == "Sign-Up":
             HDresser.append(Hair_Dresser())
@@ -158,6 +169,8 @@ class Window:
                     self.user_index = x
                     self.fourth_Page_H()
                 else:
+                    count += 1
+                if count == len(HDresser):
                     self.third_Page()
     def schedule(self, n, time):
         global HDresser
@@ -239,6 +252,9 @@ class Window:
         text = Label(self.fourthC, text="Choose Date below: ", font=("Ariel", 14))
         text.place(x=50, y=50)
 
+        BExit = Button(self.fourthC, text="Exit", width=15, height=5, command=lambda: self.button_Pushed("Exit"))
+        BExit.place(x= 350, y=30)
+
         global textDate, dates
         button = []
         date = []
@@ -268,7 +284,7 @@ class Window:
 
     def fourth_Page_H(self):
         self.fourthH = Toplevel(self.first)
-        self.fourthH.geometry("400x200")
+        self.fourthH.geometry("500x200")
 
         BViewAppointments = Button(self.fourthH, text='View Appointments', width=15, height=5,
                                    command=lambda: self.button_Pushed("VA"))  # will take to the fifthHV page
@@ -277,8 +293,12 @@ class Window:
         BEditAvailability = Button(self.fourthH, text='Edit Availability', width=15, height=5,
                                    command=lambda: self.button_Pushed("EA"))  # will take to the fifthHE page
         BEditAvailability.place(x=200, y=50)
+
+        BExit = Button(self.fourthH, text="Exit", width=15, height=5, command=lambda: self.button_Pushed("Exit"))
+        BExit.place(x=325, y=50)
+
     def fifth_Page_C(self):
-        #add a scroll bar or fix the scaling somehow???
+        #add a scroll bar to this page
         self.fifthC = Toplevel(self.first)
         self.fifthC.geometry("500x1700")
 
@@ -286,6 +306,9 @@ class Window:
         text = []
         btime = []
         button_index = 0
+
+        BBack = Button(self.fifthC, text="Back", width=15, height=5, command=lambda: self.button_Pushed("BfifthC"))
+        BBack.place(x=300, y=50)
 
         text.append(Label(self.fifthC, text=self.date, font=('Ariel', 14)))
         text[0].place(x=50, y=50)
@@ -325,23 +348,23 @@ class Window:
 
     def fifth_Page_HV(self):
         self.fifthHV = Toplevel(self.first)
-        self.fifthHV.geometry("300x800")
+        self.fifthHV.geometry("400x800")
 
         global HDresser
         text = []
         count = 0
 
-        text.append(Label(self.fifthHV, text="booked appointments: ", font=('Ariel', 14)))
+        text.append(Label(self.fifthHV, text="booked appointments: ", font=('Ariel', 16)))
         text[0].place(x=50, y=50)
         for key, appointment in HDresser[self.user_index].appointments.items():
             print(appointment["date"], appointment["time"], appointment["client"])
             text.append(Label(self.fifthHV, text=(appointment["date"] + " " + appointment["time"] + "\n" + appointment["client"]),
                               font=('Ariel', 14)))
-            text[count+1].place(x=50, y=25*count+175)
+            text[count+1].place(x=55, y=75*count+125)
             count += 1
 
         BBack = Button(self.fifthHV, text="back", width=10, height=5, command=lambda: self.button_Pushed("BfifthV"))
-        BBack.place(x=200, y=50)
+        BBack.place(x=300, y=50)
 
     def sixth_Page_C(self, n):
         self.sixthC = Toplevel(self.first)
