@@ -320,7 +320,7 @@ class Window:
             extra_index = 0
             for y, H in enumerate(HDresser):
                 print(H)
-                for z, A in enumerate(H.availability[self.date]):
+                for z, A in enumerate(H.availability.get(self.date, [])):
                     print(A)
                     if A == slot:
                         print(A)
