@@ -391,7 +391,7 @@ class Window:
         BBack.place(x=100,y=375)
     def sixth_Page_HE(self):
         self.sixthHE = Toplevel(self.first)
-        self.sixthHE.geometry("1700x650")
+        self.sixthHE.geometry("1800x650")
 
         global HDresser, time_slots
         B1 = []
@@ -427,6 +427,9 @@ class Window:
 
         BBack = Button(self.sixthHE, text="Back", width=10, height=5, command=lambda: self.button_Pushed("BsixthE"))
         BBack.place(x=50, y=550)
+
+        BExit = Button(self.sixthHE, text="Exit", width=10, height=5, command=lambda: self.button_Pushed("Exit"))
+        BExit.place(x=150, y=550)
 
 def opening_Function():
     global HDresser, client, h, c
