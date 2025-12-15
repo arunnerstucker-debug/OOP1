@@ -265,28 +265,16 @@ class Window:
             date = list(set(date + d))
         self.dates = date
 
-        for x, d in enumerate(date):
+        for x1, d in enumerate(date):
             b = Button(self.fourthC, text=d, width=10, height=5,
                        command=lambda day = d: self.button_Pushed(day))
             button.append(b)
-            if x < 6:
-                y = 150
-            elif x < 12:
-                x = x-6
-                y = 250
-            elif x < 18:
-                x = x-12
-                y = 350
-            elif x < 24:
-                x = x - 18
-                y = 450
-            elif x < 30:
-                x = x - 24
-                y = 550
-            elif x < 36:
-                x = x - 30
-                y = 650
-            b.place(x=50 + 100 * x, y=y)
+            for x2 in range(6):
+                if x1 < (x2+1) *6:
+                    x1 = x1 - x2 *6
+                    y1 = 150 + x2*100
+                    break
+            b.place(x=50 + 100 * x1, y=y1)
 
     def fourth_Page_H(self):
         self.fourthH = Toplevel(self.first)
