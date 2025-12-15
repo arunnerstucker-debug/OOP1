@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import *
+from tkinter import ttk, Toplevel
 import pickle
 import os
 
@@ -39,26 +40,26 @@ class Hair_Dresser:
         self.appointments = {}
         self.breaks = {}
         self.key = 0
+    def add_Hair_Dresser(self, uname, pword):
+        self.username = uname
+        self.password = pword
     def set_Up_Availability(self, date):
         self.availability.update({date:["9:00","9:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "1:00", "1:30",
                                         "2:00", "2:30", "3:00", "3:30", "4:00", "4:30"]})
         self.dates.append(date)
         self.breaks.update({date:[]})
-    def add_Hair_Dresser(self, uname, pword):
-        self.username = uname
-        self.password = pword
     def increase_Availability(self, date, TimeSlot):
         self.dates.append(date)
         self.availability[date].append(TimeSlot)
         self.breaks[date].remove(TimeSlot)
+    def decrease_Availability(self, date, TimeSlot):
+        self.availability[date].remove(TimeSlot)
+        self.breaks[date].append(TimeSlot)
     def add_Appointment(self, date, TimeSlot, client):
         self.availability[date].remove(TimeSlot)
         key = "A" + str(self.key)
         self.appointments.update({key:{"date": date,"time":TimeSlot, "client": client}})
         self.key += 1
-    def decrease_Availability(self, date, TimeSlot):
-        self.availability[date].remove(TimeSlot)
-        self.breaks[date].append(TimeSlot)
     def cancel_Appointment(self, appointment, date, TimeSlot):
         del self.appointments[appointment]
         self.availability[date].append(TimeSlot)
@@ -271,14 +272,19 @@ class Window:
             if x < 6:
                 y = 150
             elif x < 12:
+                x = x-6
                 y = 250
             elif x < 18:
+                x = x-12
                 y = 350
             elif x < 24:
+                x = x - 18
                 y = 450
             elif x < 30:
+                x = x - 24
                 y = 550
             elif x < 36:
+                x = x - 30
                 y = 650
             b.place(x=50 + 100 * x, y=y)
 
@@ -298,25 +304,50 @@ class Window:
         BExit.place(x=325, y=50)
 
     def fifth_Page_C(self):
-        #add a scroll bar to this page
+        # Create main window
         self.fifthC = Toplevel(self.first)
-        self.fifthC.geometry("500x1700")
+        self.fifthC.geometry("500x600")
+
+        # Create a main frame
+        main_frame = tk.Frame(self.fifthC)
+        main_frame.pack(fill=tk.BOTH, expand=1)
+
+        # Create a canvas inside the main frame
+        canvas = tk.Canvas(main_frame)
+        canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+
+        # Add a scrollbar to the canvas
+        scrollbar = ttk.Scrollbar(main_frame, orient=tk.VERTICAL, command=canvas.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        # Configure the canvas to work with scrollbar
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
+        # Create another frame inside the canvas
+        second_frame = tk.Frame(canvas)
+
+        # Add that new frame to a window in the canvas
+        canvas.create_window((0, 0), window=second_frame, anchor="nw")
+
+        # Bind the frame configuration to update scroll region
+        second_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
 
         global HDresser, time_slots
         text = []
         btime = []
         button_index = 0
 
-        BBack = Button(self.fifthC, text="Back", width=15, height=5, command=lambda: self.button_Pushed("BfifthC"))
-        BBack.place(x=300, y=50)
+        BBack = Button(second_frame, text="Back", width=15, height=5, command=lambda: self.button_Pushed("BfifthC"))
+        BBack.grid(row=0, column= 6, padx= 5, pady=10)
 
-        text.append(Label(self.fifthC, text=self.date, font=('Ariel', 14)))
-        text[0].place(x=50, y=50)
+        text.append(Label(second_frame, text=self.date, font=('Ariel', 14)))
+        text[0].grid(row=0, column= 0, columnspan= 3, pady=10)
 
         for x, slot in enumerate(time_slots):
             print(slot)
-            text.append(Label(self.fifthC, text=time_slots[x], font=('Ariel', 14)))
-            text[x+1].place(x=50, y=(200*x+150))
+            text.append(Label(second_frame, text=time_slots[x], font=('Ariel', 14)))
+            text[x + 1].grid(row=2*x + 1, column= 0, columnspan= 5, pady=10)
             extra_index = 0
             for y, H in enumerate(HDresser):
                 print(H)
@@ -324,9 +355,9 @@ class Window:
                     print(A)
                     if A == slot:
                         print(A)
-                        btime.append(Button(self.fifthC, text = H.username, width= 10, height = 5, command=lambda index=y, s=slot:
-                        self.schedule(index, s)))
-                        btime[button_index].place(x=(100*extra_index +50),y=(200*x+250))
+                        btime.append(Button(second_frame, text=H.username, width=10, height=5,
+                                            command=lambda index=y, s=slot: self.schedule(index, s)))
+                        btime[button_index].grid(row=2*x + 2, column= extra_index, padx = 5, pady=10)
                         button_index += 1
                         extra_index += 1
     def fifth_Page_HE(self):
@@ -391,7 +422,7 @@ class Window:
         BBack.place(x=100,y=375)
     def sixth_Page_HE(self):
         self.sixthHE = Toplevel(self.first)
-        self.sixthHE.geometry("1800x650")
+        self.sixthHE.geometry("1700x650")
 
         global HDresser, time_slots
         B1 = []
@@ -428,8 +459,6 @@ class Window:
         BBack = Button(self.sixthHE, text="Back", width=10, height=5, command=lambda: self.button_Pushed("BsixthE"))
         BBack.place(x=50, y=550)
 
-        BExit = Button(self.sixthHE, text="Exit", width=10, height=5, command=lambda: self.button_Pushed("Exit"))
-        BExit.place(x=150, y=550)
 
 def opening_Function():
     global HDresser, client, h, c
